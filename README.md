@@ -1,2 +1,1 @@
-# cbc-examples-and-tools
-Carbon Black Cloud Examples &amp; Tools
+# Carbon Black Cloud Examples and Tools
