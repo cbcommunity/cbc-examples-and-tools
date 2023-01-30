@@ -9,6 +9,7 @@ JSON containing policy information, this tool has got you covered.
 **Latest Version:** 1.0.0
 <br>
 **Release Date:** January 17, 2023
+<br>
 **Supported OS:** MacOS
 
 <img width="1904" alt="app_view" src="https://user-images.githubusercontent.com/74309356/215456620-3be14907-fc9a-4480-9504-e19ae2182f3c.png">
