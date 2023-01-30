@@ -9,12 +9,13 @@ import eel
 from cbc_sdk import CBCloudAPI
 from cbc_sdk.platform import Policy
 
+__title__ = 'Policy Copier App'
 __version__ = '1.0.0'
 
 
 def get_cbc(profile):
     "text"
-    return CBCloudAPI(profile=profile, integration_name=(f'Policy Copier App {__version__}'))
+    return CBCloudAPI(profile=profile, integration_name=(f'{__title__}} {__version__}'))
 
 
 def credentials_handler():
@@ -473,7 +474,7 @@ def create_policy(data, raw_data, settings):
             req_body_json = json.dumps(req_body)
             req_url = f'{import_orgs[org]["URL"]}policyservice/v1/orgs/{import_orgs[org]["ORG_KEY"]}/policies'
             req_headers = {'Content-Type': 'application/json',
-                           'integration_name': f'Policy Import Export App {__version__}',
+                           'integration_name': f'{__title__} {__version__}',
                            'X-AUTH-TOKEN': import_orgs[org]["TOKEN"]}
 
             requests.post(url=req_url, data=req_body_json, headers=req_headers)
