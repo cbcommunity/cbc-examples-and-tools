@@ -1,4 +1,4 @@
-# org-management-app
+# Policy Copier App
 This GUI App allows you to copy Policies and their rules from one Organization to an unlimited number of other Organizations.
 
 The Policy Copier is a user-friendly GUI tool that easily transfers policies and rules from one organization to
