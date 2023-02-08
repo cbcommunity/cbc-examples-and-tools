@@ -10,12 +10,12 @@ from cbc_sdk import CBCloudAPI
 from cbc_sdk.platform import Policy
 
 __title__ = 'Policy Copier App'
-__version__ = '1.0.0'
+__version__ = 'v1.0.0'
 
 
 def get_cbc(profile):
     "text"
-    return CBCloudAPI(profile=profile, integration_name=(f'{__title__}} {__version__}'))
+    return CBCloudAPI(profile=profile, integration_name=(__title__ + __version__))
 
 
 def credentials_handler():
