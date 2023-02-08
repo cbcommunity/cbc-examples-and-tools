@@ -139,7 +139,9 @@ def save_org_data(orgs, org_type):
         lines += f'org_key={data["ORG_KEY"]}\n'
 
     if lines != '':
-        with open("/Users/hkaragitliev/.carbonblack/credentials.cbc", "a") as updated_credentials:
+        path = os.path.expanduser( '~' )
+        credentials = path + "/.carbonblack/credentials.cbc"
+        with open(credentials, "a") as updated_credentials:
             updated_credentials.write(lines)
         read_config()
 
