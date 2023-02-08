@@ -16,6 +16,7 @@ JSON containing policy information, this tool has got you covered.
 ## App Features
 
 - Copy Policies and rules from one Organization to any number of other Organizations across multiple environments
+- View multi-org policy and rule information from a single source
 - Compare Policy information between Organizations (coming in next release)
 - Save and Load Policy information (coming in next release)
 - Import Policy information (coming in next release)
