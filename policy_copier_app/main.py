@@ -27,6 +27,10 @@ def credentials_handler():
         with open(credentials) as credentials_f:
             contents = credentials_f.readlines()
     except FileNotFoundError:
+        if not os.path.exists(path + "./carbonblack"):
+            print(path + "/.carbonblack")
+            os.mkdir(path + "/.carbonblack")
+            subprocess.call(['chmod', '700', path + "/.carbonblack"])
         with open(credentials, "w") as credentials_f:
             credentials_f.write('')
         subprocess.call(['chmod', '600', credentials])
