@@ -9,7 +9,7 @@ import eel
 from cbc_sdk import CBCloudAPI
 from cbc_sdk.platform import Policy
 
-__title__ = 'Policy Copier App'
+__title__ = 'Carbon Policy Replicator'
 __version__ = 'v1.0.0'
 
 
@@ -43,13 +43,13 @@ def delete_org(org_type, org_key):
     contents, credentials_file = credentials_handler()
     if org_type == 'export_org':
         for num, line in enumerate(contents):
-            if line.startswith(f"[PolicyApp_ExportProfile_{org_key}_"):
+            if line.startswith(f"[PolicyReplicator_ExportProfile_{org_key}_"):
                 contents[num] = line.replace('[', '[DELETED_')
             else:
                 continue
     elif org_type == 'import_org'.strip():
         for num, line in enumerate(contents):
-            if line == f"[PolicyApp_ImportProfile_{org_key.upper()}]\n":
+            if line == f"[PolicyReplicator_ImportProfile_{org_key.upper()}]\n":
                 contents[num] = line.replace('[', '[DELETED_')
             else:
                 continue
@@ -65,7 +65,7 @@ def read_config():
     global IMPORT_ORG_PROFILES
     IMPORT_ORG_PROFILES = {'export': {}, 'import': {}}
     for line in contents:
-        if line.startswith("[PolicyApp_ImportProfile_"):
+        if line.startswith("[PolicyReplicator_ImportProfile_"):
             profile_name = line[1:-2]
             cbc = get_cbc(profile_name)
             IMPORT_ORG_PROFILES['import'][cbc.credentials.org_key] = {
@@ -74,7 +74,7 @@ def read_config():
                 "ORG_KEY": cbc.credentials.org_key,
                 "PROFILE": profile_name
             }
-        elif line.startswith("[PolicyApp_ExportProfile_"):
+        elif line.startswith("[PolicyReplicator_ExportProfile_"):
             profile_name = line[1:-2]
             cbc = get_cbc(profile_name)
             IMPORT_ORG_PROFILES['export'] = {
@@ -124,9 +124,9 @@ def save_org_data(orgs, org_type):
     lines = ''
     for org in orgs:
         data = orgs[org]
-        profile_name = 'PolicyApp_ImportProfile'
+        profile_name = 'PolicyReplicator_ImportProfile'
         if org_type == 'export_org':
-            profile_name = 'PolicyApp_ExportProfile'
+            profile_name = 'PolicyReplicator_ExportProfile'
         if data['URL'] == '' or data['ORG_KEY'] == '' or data['API_ID'] == '' or data['API_SECRET'] == '':
             continue
         lines += f'\n[{profile_name}_{data["ORG_KEY"]}_{data["API_ID"]}]\n'

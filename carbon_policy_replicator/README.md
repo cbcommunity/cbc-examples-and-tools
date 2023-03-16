@@ -1,8 +1,8 @@
-# Policy Copier App
-Copy Policies and their rules from one Organization to an unlimited number of other Organizations.
+# Carbon Policy Replicator
+Replicate Policies and their rules from one Organization to an unlimited number of other Organizations.
 
-The Policy Copier is a user-friendly GUI tool that easily transfers policies and rules from one Organization to
-numerous others. With this tool, you can copy one or more Policies with just a few clicks. The Policy Copier App also
+The Carbon Policy Replicator is a user-friendly GUI tool that easily transfers policies and rules from one Organization to
+numerous others. With this tool, you can copy one or more Policies with just a few clicks. The Carbon Policy Replicator also
 can save your data, so you can easily return to it later. Whether you want to import previously saved data or raw
 JSON containing policy information, this tool has got you covered.
 
@@ -30,10 +30,10 @@ JSON containing policy information, this tool has got you covered.
 git clone git@github.com:cbcommunity/cbc-examples-and-tools.git
 ```
 
-2. Navigate to the Policy Copier folder and install the requirements:
+2. Navigate to the `carbon_policy_replicator` folder and install the requirements:
 
 ```shell
-cd cbc-examples-and-tools/policy-copier
+cd cbc-examples-and-tools/carbon_policy_replicator
 pip install -r requirements.txt
 ```
 
