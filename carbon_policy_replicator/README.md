@@ -7,10 +7,10 @@
  Under the hood, this tool uses the `Carbon Black Cloud Python SDK` for things like Authentication and Credentials Handling, Retrieving Data from Carbon Black Cloud and Handling Errors and Exceptions. This is one example of how the SDK can be used to build powerful tools and integrations to streamline your workflows.
 
  **Latest Version:** 1.0.0
- <br>
+
  **Release Date:** January 17, 2023
- <br>
- **Supported OS:** MacOS
+
+ **Supported OS:** MacOS, Linux
 
  ## App Features
 
