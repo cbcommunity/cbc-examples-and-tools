@@ -13,3 +13,7 @@ GUI tool to replicate policies and their rules to an unlimited number organizati
 * [Developer Network](https://developer.carbonblack.com) - Carbon Black API Documentation
 * [CBC Python SDK](https://developer.carbonblack.com/reference/carbon-black-cloud/integrations/python-sdk)
 * [CBC Postman Collection](https://documenter.getpostman.com/view/19038029/2s8YK4to5o)
+
+# Have questions or feedback?
+Open an issue in the [GitHub Repository](https://github.com/cbcommunity/cbc-examples-and-tools/issues)
+Other ways to [contact us](https://developer.carbonblack.com/contact)
