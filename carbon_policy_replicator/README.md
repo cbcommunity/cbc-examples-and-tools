@@ -65,7 +65,7 @@ Carbon Black Cloud Python SDK
 * [Github](https://github.com/carbonblack/carbon-black-cloud-sdk-python/tree/master)
 * [Read the Docs](https://carbon-black-cloud-python-sdk.readthedocs.io/)
 
-Developer Network
+Developer Network - Carbon Black API Documentation
 * [Developer Network](https://developer.carbonblack.com)
 * [Policy Service API](https://developer.carbonblack.com/reference/carbon-black-cloud/platform/latest/policy-service/)
 
