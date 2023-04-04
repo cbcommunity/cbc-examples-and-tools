@@ -18,7 +18,6 @@ Under the hood, this tool uses the Carbon Black Cloud Python SDK for things like
 * View multi-org policy and rule information from a single source
 * Compare Policy information between Organizations (coming in next release)
 * Save and Load Policy information (coming in next release)
-* Import Policy information (coming in next release)
 
 <img width="900" alt="Screenshot 2023-03-16 at 12 33 28" src="https://user-images.githubusercontent.com/74309356/225590737-e36fac22-6dbf-4a29-9713-77d6e450632a.png">
 
