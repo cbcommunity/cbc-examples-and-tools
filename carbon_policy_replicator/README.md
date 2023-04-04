@@ -20,7 +20,7 @@ Under the hood, this tool uses the Carbon Black Cloud Python SDK for things like
 * Save and Load Policy information (coming in next release)
 * Import Policy information (coming in next release)
 
-<img width="1904" alt="Screenshot 2023-03-16 at 12 33 28" src="https://user-images.githubusercontent.com/74309356/225590737-e36fac22-6dbf-4a29-9713-77d6e450632a.png">
+<img width="900" alt="Screenshot 2023-03-16 at 12 33 28" src="https://user-images.githubusercontent.com/74309356/225590737-e36fac22-6dbf-4a29-9713-77d6e450632a.png">
 
 ## Getting Started
 
@@ -75,5 +75,3 @@ Postman
 
 Have questions or feedback?
 [Contact Us](https://developer.carbonblack.com/contact).
-
-
