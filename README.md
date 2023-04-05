@@ -16,4 +16,5 @@ GUI tool to replicate policies and their rules to an unlimited number organizati
 
 # Have questions or feedback?
 Open an issue in the [GitHub Repository](https://github.com/cbcommunity/cbc-examples-and-tools/issues)
+
 Other ways to [contact us](https://developer.carbonblack.com/contact)
