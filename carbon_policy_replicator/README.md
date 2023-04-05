@@ -1,24 +1,28 @@
 # Carbon Policy Replicator
-Replicate Policies and their rules to an unlimited number Organizations across different Environments.
+Replicate policies and their rules to an unlimited number organizations across different Environments.
 
-The Carbon Policy Replicator is a user-friendly Python-based GUI tool that easily transfers policies and rules from one Organization to
-numerous others. This tool can copy one or more Policies with just a few clicks or save your data so that you can return to it later.
+The `Carbon Policy Replicator` is a user-friendly Python-based GUI tool that easily transfers policies and rules from one organization to
+numerous others. This tool can replicate one or more policies with just a few clicks or save your data so that you can return to it later.
 
-Under the hood, this tool uses the Carbon Black Cloud Python SDK for things like Authentication and Credentials Handling, Retrieving Data from Carbon Black Cloud and Handling Errors and Exceptions. This is one example of how the SDK can be used to build powerful tools and integrations to streamline your workflows.
+Under the hood, this tool uses the `Carbon Black Cloud Python SDK` for things like Authentication and Credentials Handling, Retrieving Data from Carbon Black Cloud and Handling Errors and Exceptions. This is one example of how the SDK can be used to build powerful tools and integrations to streamline your workflows.
 
 **Latest Version:** 1.0.0
-<br>
+
 **Release Date:** January 17, 2023
-<br>
+
 **Supported OS:** MacOS
 
 ## App Features
 
-* Copy Policies and rules from one Organization to any number of other Organizations across multiple environments
+* Replicate policies and rules from one organization to any number of other organizations across multiple environments
 * View multi-org policy and rule information from a single source
-* Compare Policy information between Organizations (coming in next release)
+
+Have an idea of a functionality that you want in the tool? Make a suggestion as a [GitHub issue](https://github.com/cbcommunity/cbc-examples-and-tools/issues).
+
+## Future Extensions
+* Compare Policy information between organizations (coming in next release)
 * Save and Load Policy information (coming in next release)
-* Import Policy information (coming in next release)
+* Copy Core Prevention and Host Based Firewall rules
 
 <img width="900" alt="Screenshot 2023-03-16 at 12 33 28" src="https://user-images.githubusercontent.com/74309356/225590737-e36fac22-6dbf-4a29-9713-77d6e450632a.png">
 
@@ -66,12 +70,14 @@ Carbon Black Cloud Python SDK
 * [Github](https://github.com/carbonblack/carbon-black-cloud-sdk-python/tree/master)
 * [Read the Docs](https://carbon-black-cloud-python-sdk.readthedocs.io/)
 
-Developer Network
+Developer Network - Carbon Black API Documentation
 * [Developer Network](https://developer.carbonblack.com)
 * [Policy Service API](https://developer.carbonblack.com/reference/carbon-black-cloud/platform/latest/policy-service/)
 
 Postman
 * [CBC Postman Collection](https://documenter.getpostman.com/view/19038029/2s8YK4to5o#intro)
 
-Have questions or feedback?
-[Contact Us](https://developer.carbonblack.com/contact).
+## Have questions or feedback?
+Open an issue in the [GitHub Repository](https://github.com/cbcommunity/cbc-examples-and-tools/issues)
+
+Other ways to [contact us](https://developer.carbonblack.com/contact)
