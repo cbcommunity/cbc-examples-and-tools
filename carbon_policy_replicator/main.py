@@ -52,7 +52,6 @@ def delete_org(org_type, org_key):
     elif org_type == 'import_org'.strip():
         for num, line in enumerate(contents):
             if line == f"[PolicyReplicator_ImportProfile_{org_key}]\n":
-                print(f"[PolicyReplicator_ImportProfile_{org_key}]\n")
                 contents[num] = line.replace('[', '[DELETED_')
             else:
                 continue
