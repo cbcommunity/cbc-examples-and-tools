@@ -155,6 +155,8 @@ def import_orgs_settings():
     for org in org_profiles:
         url = org_profiles[org]['URL']
         api_secret, api_id = org_profiles[org]['TOKEN'].split('/')
+        if api_secret != '':
+            api_secret = '*************************'
         # notes = ''
         html += '<div class="card m-3 mb-4 border">\n'
         html += f'    <button type="button" onClick="delete_org(\'import_org\', \'{org}_{api_id}\')" data-bs-dismiss="modal" class="btn btn-outline-danger btn-sm position-absolute m-3 end-0 btn-sm">\n'
@@ -257,17 +259,21 @@ def get_import_data_confirmation(data):
 
 
 @eel.expose
-def get_import_orgs_info():
+def get_import_orgs_info(refresh_info=None):
     "text"
+    read_config()
     org_profiles = IMPORT_ORG_PROFILES['import']
 
-    org_info = {"org_keys": "",
-                "data_timestamp": str(datetime.datetime.now()),
-                "orgs_count_total": 0,
+    org_info = {"org_keys": ', '.join(org_profiles.keys()),
+                "data_timestamp": "-",
+                "orgs_count_total": len(org_profiles.keys()),
                 "rule_count_total": 0,
                 "policy_count_total": 0,
                 "raw_html": "",
                 "orgs_metainfo_html": ""}
+    if refresh_info is True:
+        org_info["raw_html"] = "<div class='alert alert-warning m-3 text-center' role='alert'>Configuration has changed. Click Get Policy Info to update.</div>",
+        return json.dumps(org_info)
 
     html = ''
     for import_org in org_profiles:
@@ -344,6 +350,7 @@ def get_import_orgs_info():
         org_info["raw_html"] = html
 
     org_info["raw_html"] = html
+    org_info["data_timestamp"] = str(datetime.datetime.now())
     org_info["org_keys"] = ', '.join(org_profiles.keys())
     org_info["orgs_count_total"] = len(org_profiles.keys())
 
@@ -355,7 +362,19 @@ def get_export_org_info():
     "text"
     read_config()
     profile = IMPORT_ORG_PROFILES['export']
-    cbc = get_cbc(profile['PROFILE'])
+    org_info = {"org_key": "-",
+                "url": "-",
+                "data_source": "-",
+                "data_timestamp": "-",
+                "policy_count_total": "-",
+                "rule_count_total": "-",
+                "raw_html": "<div class='alert alert-warning m-3 text-center' role='alert'>Export Org not configured.</div>",
+                "raw_data": {}}
+    try:
+        cbc = get_cbc(profile['PROFILE'])
+    except KeyError:
+        return json.dumps(org_info)
+
     policy_info = cbc.select(Policy)
 
     org_info = {"org_key": profile['ORG_KEY'],
@@ -490,6 +509,31 @@ def create_policy(data, raw_data, settings):
 def import_org_data(selected_policies, raw_data, import_settings):
     "text"
     create_policy(selected_policies, raw_data, import_settings)
+
+
+@eel.expose
+def refresh_org_data(org_type):
+    "text"
+    org_info = {}
+    data = IMPORT_ORG_PROFILES[org_type]
+    if org_type == 'import':
+        org_info = {"org_keys": ', '.join(data.keys()),
+                    "data_timestamp": "-",
+                    "orgs_count_total": len(data.keys()),
+                    "rule_count_total": "-",
+                    "policy_count_total": "-",
+                    "raw_html": "<div class='alert alert-info m-3 text-center' role='alert'>Configuration has changed. Click Get Policy Info to update.</div>",
+                    "orgs_metainfo_html": ""}
+    elif org_type == 'export':
+        org_info = {"org_key": data['ORG_KEY'],
+                    "url": data['URL'],
+                    "data_source": "-",
+                    "data_timestamp": "-",
+                    "policy_count_total": "-",
+                    "rule_count_total": "-",
+                    "raw_html": "<div class='alert alert-info m-3 text-center' role='alert'>Configuration has changed. Click Get Policy Info to update.</div>",
+                    "raw_data": {}}
+    return json.dumps(org_info)
 
 
 if __name__ == "__main__":
