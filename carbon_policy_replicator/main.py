@@ -3,6 +3,7 @@ import datetime
 import os
 import subprocess
 import time
+import uuid
 import json
 import requests
 import eel
@@ -43,13 +44,15 @@ def delete_org(org_type, org_key):
     contents, credentials_file = credentials_handler()
     if org_type == 'export_org':
         for num, line in enumerate(contents):
+            # if line == f"[PolicyReplicator_ExportProfile_{org_key}]\n":
             if line.startswith(f"[PolicyReplicator_ExportProfile_{org_key}_"):
                 contents[num] = line.replace('[', '[DELETED_')
             else:
                 continue
     elif org_type == 'import_org'.strip():
         for num, line in enumerate(contents):
-            if line == f"[PolicyReplicator_ImportProfile_{org_key.upper()}]\n":
+            if line == f"[PolicyReplicator_ImportProfile_{org_key}]\n":
+                print(f"[PolicyReplicator_ImportProfile_{org_key}]\n")
                 contents[num] = line.replace('[', '[DELETED_')
             else:
                 continue
@@ -123,13 +126,14 @@ def save_org_data(orgs, org_type):
     "text"
     lines = ''
     for org in orgs:
+        unique_id = str(uuid.uuid1()).split("-")[0]
         data = orgs[org]
         profile_name = 'PolicyReplicator_ImportProfile'
         if org_type == 'export_org':
             profile_name = 'PolicyReplicator_ExportProfile'
         if data['URL'] == '' or data['ORG_KEY'] == '' or data['API_ID'] == '' or data['API_SECRET'] == '':
             continue
-        lines += f'\n[{profile_name}_{data["ORG_KEY"]}_{data["API_ID"]}]\n'
+        lines += f'\n[{profile_name}_{data["ORG_KEY"]}_{data["API_ID"]}_{unique_id}]\n'
         if data["URL"][-1] != '/':
             data["URL"] += '/'
         lines += f'url={data["URL"]}\n'
@@ -154,12 +158,14 @@ def import_orgs_settings():
     html = ''
     for org in org_profiles:
         url = org_profiles[org]['URL']
+        unique_id = org_profiles[org]['PROFILE'].split('_')[-1]
         api_secret, api_id = org_profiles[org]['TOKEN'].split('/')
+        id = f'{org}_{api_id}_{unique_id}'
         if api_secret != '':
             api_secret = '*************************'
         # notes = ''
         html += '<div class="card m-3 mb-4 border">\n'
-        html += f'    <button type="button" onClick="delete_org(\'import_org\', \'{org}_{api_id}\')" data-bs-dismiss="modal" class="btn btn-outline-danger btn-sm position-absolute m-3 end-0 btn-sm">\n'
+        html += f'    <button type="button" onClick="delete_org(\'import_org\', \'{id}\')" data-bs-dismiss="modal" class="btn btn-outline-danger btn-sm position-absolute m-3 end-0 btn-sm">\n'
         html += '      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">\n'
         html += '        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>\n'
         html += '        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path>\n'
@@ -168,20 +174,20 @@ def import_orgs_settings():
         html += '    <fieldset disabled>\n'
         html += '        <form class="p-3 mt-3">\n'
         html += '            <div class="mb-3">\n'
-        html += f'                <label for="ImportOrgKey_{org}_{api_id}" class="form-label mb-0"><h6>Org Key</h6></label>\n'
-        html += f'                <input value="{org}" class="form-control form-control-sm text-muted" id="ImportOrgKey_{org}_{api_id}">\n'
+        html += f'                <label for="ImportOrgKey_{id}" class="form-label mb-0"><h6>Org Key</h6></label>\n'
+        html += f'                <input value="{org}" class="form-control form-control-sm text-muted" id="ImportOrgKey_{id}">\n'
         html += '            </div>\n'
         html += '            <div class="mb-3">\n'
-        html += f'                <label for="ImportURL_{org}_{api_id}" class="form-label mb-0"><h6>URL</h6></label>\n'
-        html += f'                <input value="{url}" class="form-control form-control-sm text-muted" id="ImportURL_{org}_{api_id}">\n'
+        html += f'                <label for="ImportURL_{id}" class="form-label mb-0"><h6>URL</h6></label>\n'
+        html += f'                <input value="{url}" class="form-control form-control-sm text-muted" id="ImportURL_{id}">\n'
         html += '            </div>\n'
         html += '            <div class="mb-3">\n'
-        html += f'                <label for="apiId_{org}_{api_id}" class="form-label mb-0"><h6>API ID</h6></label>\n'
-        html += f'                <input value="{api_id}" class="form-control form-control-sm text-muted" id="apiId_{org}_{api_id}">\n'
+        html += f'                <label for="apiId_{id}" class="form-label mb-0"><h6>API ID</h6></label>\n'
+        html += f'                <input value="{api_id}" class="form-control form-control-sm text-muted" id="apiId_{id}">\n'
         html += '            </div>\n'
         html += '            <div class="mb-3">\n'
-        html += f'                <label for="apiSecretKey_{org}_{api_id}" class="form-label mb-0"><h6>API Secret Key</h6></label>\n'
-        html += f'                <input type="password" value="{api_secret}" class="form-control form-control-sm text-muted" id="apiSecretKey_{org}_{api_id}">\n'
+        html += f'                <label for="apiSecretKey_{id}" class="form-label mb-0"><h6>API Secret Key</h6></label>\n'
+        html += f'                <input type="password" value="{api_secret}" class="form-control form-control-sm text-muted" id="apiSecretKey_{id}">\n'
         html += '            </div>\n'
         # html += '            <div class="mb-3">\n'
         # html += f'                <label for="notes_{org}" class="form-label mb-0"><h6>Notes</h6></label>\n'
