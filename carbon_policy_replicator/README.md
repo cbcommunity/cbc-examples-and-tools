@@ -12,6 +12,8 @@ Under the hood, this tool uses the `Carbon Black Cloud Python SDK` for things li
 
 **Supported OS:** MacOS, Linux
 
+**Requires:** This tool requires Google Chrome browser
+
 ## App Features
 
 * Replicate policies and rules from one organization to any number of other organizations across multiple environments
