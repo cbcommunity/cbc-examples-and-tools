@@ -3,6 +3,7 @@ import datetime
 import os
 import subprocess
 import time
+import uuid
 import json
 import requests
 import eel
@@ -43,13 +44,14 @@ def delete_org(org_type, org_key):
     contents, credentials_file = credentials_handler()
     if org_type == 'export_org':
         for num, line in enumerate(contents):
+            # if line == f"[PolicyReplicator_ExportProfile_{org_key}]\n":
             if line.startswith(f"[PolicyReplicator_ExportProfile_{org_key}_"):
                 contents[num] = line.replace('[', '[DELETED_')
             else:
                 continue
     elif org_type == 'import_org'.strip():
         for num, line in enumerate(contents):
-            if line == f"[PolicyReplicator_ImportProfile_{org_key.upper()}]\n":
+            if line == f"[PolicyReplicator_ImportProfile_{org_key}]\n":
                 contents[num] = line.replace('[', '[DELETED_')
             else:
                 continue
@@ -123,13 +125,14 @@ def save_org_data(orgs, org_type):
     "text"
     lines = ''
     for org in orgs:
+        unique_id = str(uuid.uuid1()).split("-")[0]
         data = orgs[org]
         profile_name = 'PolicyReplicator_ImportProfile'
         if org_type == 'export_org':
             profile_name = 'PolicyReplicator_ExportProfile'
         if data['URL'] == '' or data['ORG_KEY'] == '' or data['API_ID'] == '' or data['API_SECRET'] == '':
             continue
-        lines += f'\n[{profile_name}_{data["ORG_KEY"]}_{data["API_ID"]}]\n'
+        lines += f'\n[{profile_name}_{data["ORG_KEY"]}_{data["API_ID"]}_{unique_id}]\n'
         if data["URL"][-1] != '/':
             data["URL"] += '/'
         lines += f'url={data["URL"]}\n'
@@ -154,10 +157,14 @@ def import_orgs_settings():
     html = ''
     for org in org_profiles:
         url = org_profiles[org]['URL']
+        unique_id = org_profiles[org]['PROFILE'].split('_')[-1]
         api_secret, api_id = org_profiles[org]['TOKEN'].split('/')
+        id = f'{org}_{api_id}_{unique_id}'
+        if api_secret != '':
+            api_secret = '*************************'
         # notes = ''
         html += '<div class="card m-3 mb-4 border">\n'
-        html += f'    <button type="button" onClick="delete_org(\'import_org\', \'{org}_{api_id}\')" data-bs-dismiss="modal" class="btn btn-outline-danger btn-sm position-absolute m-3 end-0 btn-sm">\n'
+        html += f'    <button type="button" onClick="delete_org(\'import_org\', \'{id}\')" data-bs-dismiss="modal" class="btn btn-outline-danger btn-sm position-absolute m-3 end-0 btn-sm">\n'
         html += '      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">\n'
         html += '        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>\n'
         html += '        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path>\n'
@@ -166,20 +173,20 @@ def import_orgs_settings():
         html += '    <fieldset disabled>\n'
         html += '        <form class="p-3 mt-3">\n'
         html += '            <div class="mb-3">\n'
-        html += f'                <label for="ImportOrgKey_{org}_{api_id}" class="form-label mb-0"><h6>Org Key</h6></label>\n'
-        html += f'                <input value="{org}" class="form-control form-control-sm text-muted" id="ImportOrgKey_{org}_{api_id}">\n'
+        html += f'                <label for="ImportOrgKey_{id}" class="form-label mb-0"><h6>Org Key</h6></label>\n'
+        html += f'                <input value="{org}" class="form-control form-control-sm text-muted" id="ImportOrgKey_{id}">\n'
         html += '            </div>\n'
         html += '            <div class="mb-3">\n'
-        html += f'                <label for="ImportURL_{org}_{api_id}" class="form-label mb-0"><h6>URL</h6></label>\n'
-        html += f'                <input value="{url}" class="form-control form-control-sm text-muted" id="ImportURL_{org}_{api_id}">\n'
+        html += f'                <label for="ImportURL_{id}" class="form-label mb-0"><h6>URL</h6></label>\n'
+        html += f'                <input value="{url}" class="form-control form-control-sm text-muted" id="ImportURL_{id}">\n'
         html += '            </div>\n'
         html += '            <div class="mb-3">\n'
-        html += f'                <label for="apiId_{org}_{api_id}" class="form-label mb-0"><h6>API ID</h6></label>\n'
-        html += f'                <input value="{api_id}" class="form-control form-control-sm text-muted" id="apiId_{org}_{api_id}">\n'
+        html += f'                <label for="apiId_{id}" class="form-label mb-0"><h6>API ID</h6></label>\n'
+        html += f'                <input value="{api_id}" class="form-control form-control-sm text-muted" id="apiId_{id}">\n'
         html += '            </div>\n'
         html += '            <div class="mb-3">\n'
-        html += f'                <label for="apiSecretKey_{org}_{api_id}" class="form-label mb-0"><h6>API Secret Key</h6></label>\n'
-        html += f'                <input type="password" value="{api_secret}" class="form-control form-control-sm text-muted" id="apiSecretKey_{org}_{api_id}">\n'
+        html += f'                <label for="apiSecretKey_{id}" class="form-label mb-0"><h6>API Secret Key</h6></label>\n'
+        html += f'                <input type="password" value="{api_secret}" class="form-control form-control-sm text-muted" id="apiSecretKey_{id}">\n'
         html += '            </div>\n'
         # html += '            <div class="mb-3">\n'
         # html += f'                <label for="notes_{org}" class="form-label mb-0"><h6>Notes</h6></label>\n'
@@ -257,17 +264,21 @@ def get_import_data_confirmation(data):
 
 
 @eel.expose
-def get_import_orgs_info():
+def get_import_orgs_info(refresh_info=None):
     "text"
+    read_config()
     org_profiles = IMPORT_ORG_PROFILES['import']
 
-    org_info = {"org_keys": "",
-                "data_timestamp": str(datetime.datetime.now()),
-                "orgs_count_total": 0,
+    org_info = {"org_keys": ', '.join(org_profiles.keys()),
+                "data_timestamp": "-",
+                "orgs_count_total": len(org_profiles.keys()),
                 "rule_count_total": 0,
                 "policy_count_total": 0,
                 "raw_html": "",
                 "orgs_metainfo_html": ""}
+    if refresh_info is True:
+        org_info["raw_html"] = "<div class='alert alert-warning m-3 text-center' role='alert'>Configuration has changed. Click Get Policy Info to update.</div>",
+        return json.dumps(org_info)
 
     html = ''
     for import_org in org_profiles:
@@ -344,6 +355,7 @@ def get_import_orgs_info():
         org_info["raw_html"] = html
 
     org_info["raw_html"] = html
+    org_info["data_timestamp"] = str(datetime.datetime.now())
     org_info["org_keys"] = ', '.join(org_profiles.keys())
     org_info["orgs_count_total"] = len(org_profiles.keys())
 
@@ -355,7 +367,19 @@ def get_export_org_info():
     "text"
     read_config()
     profile = IMPORT_ORG_PROFILES['export']
-    cbc = get_cbc(profile['PROFILE'])
+    org_info = {"org_key": "-",
+                "url": "-",
+                "data_source": "-",
+                "data_timestamp": "-",
+                "policy_count_total": "-",
+                "rule_count_total": "-",
+                "raw_html": "<div class='alert alert-warning m-3 text-center' role='alert'>Export Org not configured.</div>",
+                "raw_data": {}}
+    try:
+        cbc = get_cbc(profile['PROFILE'])
+    except KeyError:
+        return json.dumps(org_info)
+
     policy_info = cbc.select(Policy)
 
     org_info = {"org_key": profile['ORG_KEY'],
@@ -490,6 +514,31 @@ def create_policy(data, raw_data, settings):
 def import_org_data(selected_policies, raw_data, import_settings):
     "text"
     create_policy(selected_policies, raw_data, import_settings)
+
+
+@eel.expose
+def refresh_org_data(org_type):
+    "text"
+    org_info = {}
+    data = IMPORT_ORG_PROFILES[org_type]
+    if org_type == 'import':
+        org_info = {"org_keys": ', '.join(data.keys()),
+                    "data_timestamp": "-",
+                    "orgs_count_total": len(data.keys()),
+                    "rule_count_total": "-",
+                    "policy_count_total": "-",
+                    "raw_html": "<div class='alert alert-info m-3 text-center' role='alert'>Configuration has changed. Click Get Policy Info to update.</div>",
+                    "orgs_metainfo_html": ""}
+    elif org_type == 'export':
+        org_info = {"org_key": data['ORG_KEY'],
+                    "url": data['URL'],
+                    "data_source": "-",
+                    "data_timestamp": "-",
+                    "policy_count_total": "-",
+                    "rule_count_total": "-",
+                    "raw_html": "<div class='alert alert-info m-3 text-center' role='alert'>Configuration has changed. Click Get Policy Info to update.</div>",
+                    "raw_data": {}}
+    return json.dumps(org_info)
 
 
 if __name__ == "__main__":

@@ -24,6 +24,9 @@ async function delete_org(org_type, org_id) {
 				document.getElementById("ExportApiSecretKey").value = "";
 				if (org_key != "") {
 						await eel.delete_org(org_type, org_key)();
+						export_org_data_set = false;
+						export_org_raw_data = {};
+						get_export_org_info();
 				}
 		} else if (org_type == "import_org") {
 				// var org_key = document.getElementById("ExportOrgKey").value;
@@ -33,9 +36,15 @@ async function delete_org(org_type, org_id) {
 				document.getElementById("apiSecretKey_" + org_id).value = "";
 				if (org_id != "") {
 						await eel.delete_org(org_type, org_id)();
+						let refresh_info = true;
+						import_org_data_set = false;
+						// import_data_selected = false;
+						// import_settings = {}
+						get_import_orgs_info(refresh_info);
 				}
 		}
 		await eel.read_config()();
+		enable_import_export();
 }
 
 async function add_new_org() {
@@ -59,6 +68,8 @@ async function save_import_orgs_settings() {
 		});
 		await eel.save_org_data(new_orgs, 'import_orgs')();
 		await eel.read_config()();
+		let new_data = await eel.refresh_org_data('import')();
+		refresh_org_data(JSON.parse(new_data), 'import');
 }
 
 async function save_export_org_settings() {
@@ -73,6 +84,49 @@ async function save_export_org_settings() {
 		}
 		await eel.save_org_data(new_org, 'export_org')();
 		await eel.read_config()();
+		let new_data = await eel.refresh_org_data('export')();
+		refresh_org_data(JSON.parse(new_data), 'export');
+}
+
+async function refresh_org_data(data, type) {
+		if (type == 'export') {
+				document.getElementById("export_meta_url").textContent = data.url;
+				document.getElementById("export_meta_org_key").textContent = data.org_key;
+				document.getElementById("export_meta_data_source").textContent = data.data_source;
+				document.getElementById("export_meta_timestamp").textContent = data.data_timestamp;
+				document.getElementById("export_meta_rule_count_total").textContent = data.rule_count_total;
+				document.getElementById("export_meta_policy_count_total").textContent = data.policy_count_total;
+				document.getElementById("exportPolicyContainer").innerHTML = data.raw_html;
+				document.getElementById("getPolicyInfoBtnSpinner").classList.add("d-none");
+				if (data.org_key != "-"){
+						document.getElementById("getPolicyInfoBtn").disabled = false;
+				}
+		} else if (type == 'import') {
+				let policyInfoBtnStat = false;
+				let org_keys = "-";
+				let orgs_count_total = "-";
+				let raw_html = "";
+				if (data.orgs_count_total == 0) {
+						org_keys = "-"
+						orgs_count_total = "-"
+						policyInfoBtnStat = true;
+						raw_html = "<div class='alert alert-warning m-3 text-center' role='alert'>Import Orgs not configured.</div>"
+				} else {
+						org_keys = data.org_keys;
+						orgs_count_total = data.orgs_count_total;
+						policyInfoBtnStat = false;
+						raw_html = data.raw_html;
+				}
+				document.getElementById("import_meta_org_keys").textContent = org_keys;
+				document.getElementById("import_meta_orgs_count_total").textContent = orgs_count_total;
+				document.getElementById("import_meta_timestamp").textContent = data.data_timestamp;
+				document.getElementById("import_meta_rule_count_total").textContent = data.rule_count_total;
+				document.getElementById("import_meta_policy_count_total").textContent = data.policy_count_total;
+				document.getElementById("importPolicyContainer").innerHTML = raw_html;
+				document.getElementById("getImportPolicyInfoBtn").disabled = policyInfoBtnStat;
+				document.getElementById("getImportPolicyInfoBtnSpinner").classList.add("d-none");
+		}
+		enable_import_export();
 }
 
 async function print_import_data() {
@@ -149,10 +203,14 @@ function select_policy(export_type, policy_id, rule_id) {
 
 async function get_export_org_settings() {
 		let data = await eel.export_org_settings()();
+		let secret_key = "";
 		var credentials = JSON.parse(data);
+		if (credentials.api_secret_key != "") {
+			secret_key = "*************************"
+		}
 		document.getElementById("ExportURL").value = credentials.url;
 		document.getElementById("ExportApiId").value = credentials.api_id;
-		document.getElementById("ExportApiSecretKey").value = credentials.api_secret_key;
+		document.getElementById("ExportApiSecretKey").value = secret_key;
 		document.getElementById("ExportOrgKey").value = credentials.org_key;
 		if (credentials.org_key != "") {
 				document.getElementById("ExportOrgDeleteOrgBtn").classList.remove("d-none");
@@ -176,37 +234,33 @@ async function get_export_org_info() {
 		let org_data = await eel.get_export_org_info()();
 		var parsed_data = JSON.parse(org_data);
 		if (parsed_data) {
-				export_org_data_set = true;
-				export_org_raw_data = parsed_data.raw_data;
+				if (parsed_data.org_key == "-") {
+						export_org_data_set = false;
+						export_data = {};
+						export_org_raw_data = {};
+						document.getElementById("getPolicyInfoBtn").disabled = true;
+				} else {
+						export_org_data_set = true;
+						export_org_raw_data = parsed_data.raw_data;
+						document.getElementById("getPolicyInfoBtn").disabled = false;
+				}
+				refresh_org_data(parsed_data, 'export');
 				enable_import_export();
 		}
-		document.getElementById("export_meta_url").textContent = parsed_data.url;
-		document.getElementById("export_meta_org_key").textContent = parsed_data.org_key;
-		document.getElementById("export_meta_data_source").textContent = parsed_data.data_source;
-		document.getElementById("export_meta_timestamp").textContent = parsed_data.data_timestamp;
-		document.getElementById("export_meta_rule_count_total").textContent = parsed_data.rule_count_total;
-		document.getElementById("export_meta_policy_count_total").textContent = parsed_data.policy_count_total;
-		document.getElementById("exportPolicyContainer").innerHTML = parsed_data.raw_html;
-		// document.getElementById("savePolicyInfoBtn").classList.remove("d-none");
-		document.getElementById("getPolicyInfoBtn").disabled = false;
-		document.getElementById("getPolicyInfoBtnSpinner").classList.add("d-none");
 }
 
-async function get_import_orgs_info() {
+async function get_import_orgs_info(refresh_info) {
 		document.getElementById("getImportPolicyInfoBtn").disabled = true;
 		document.getElementById("getImportPolicyInfoBtnSpinner").classList.remove("d-none");
-		let org_data = await eel.get_import_orgs_info()();
+		let org_data = await eel.get_import_orgs_info(refresh_info)();
 		var parsed_data = JSON.parse(org_data);
-		if (parsed_data) {
+		import_org_data_set = false;
+		if (parsed_data && refresh_info != true) {
 				import_org_data_set = true;
-				enable_import_export();
+				refresh_org_data(parsed_data, 'import');
+		} else if (refresh_info == true){
+				let new_data = await eel.refresh_org_data('import')();
+				refresh_org_data(JSON.parse(new_data), 'import');
 		}
-		document.getElementById("import_meta_org_keys").textContent = parsed_data.org_keys;
-		document.getElementById("import_meta_orgs_count_total").textContent = parsed_data.orgs_count_total;
-		document.getElementById("import_meta_timestamp").textContent = parsed_data.data_timestamp;
-		document.getElementById("import_meta_rule_count_total").textContent = parsed_data.rule_count_total;
-		document.getElementById("import_meta_policy_count_total").textContent = parsed_data.policy_count_total;
-		document.getElementById("importPolicyContainer").innerHTML = parsed_data.raw_html;
-		document.getElementById("getImportPolicyInfoBtn").disabled = false;
-		document.getElementById("getImportPolicyInfoBtnSpinner").classList.add("d-none");
+		enable_import_export();
 }
