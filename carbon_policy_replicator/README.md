@@ -8,7 +8,7 @@ Under the hood, this tool uses the `Carbon Black Cloud Python SDK` for things li
 
 **Latest Version:** 1.0.0
 
-**Release Date:** January 17, 2023
+**Release Date:** April 7, 2023
 
 **Supported OS:** MacOS, Linux
 
