@@ -64,7 +64,7 @@ To start using the app, fill in your credentials into the tools' Settings. **Exp
 ## Using the Tool
 After you are done [Setting up the Tool](#setting-up-the-tool), you can move to reviewing or replication policy information.
 * To view the current policy setup, click the `Get Policy Info` button in either **Export Org** or **Import Orgs** window.
-* To replicate a policy, you need to select atleast one policy from the **Export Org**, then click the `Import Data` button. After you confirm your input in the pop-up prompt, the policy and its selected rules(selected rules) will be replicated in all the **Import Orgs** that you setup.
+* To replicate a policy, you need to select atleast one policy from the **Export Org**, then click the `Import Data` button. After you confirm your input in the pop-up prompt, the policy and its selected rules will be replicated in all the **Import Orgs** that you setup.
 
 ## Resources:
 Carbon Black Cloud Python SDK
