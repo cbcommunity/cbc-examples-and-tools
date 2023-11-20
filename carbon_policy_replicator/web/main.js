@@ -142,7 +142,7 @@ async function import_data() {
 		document.getElementById("importOrgsCard").classList.add("disableddiv");
 		get_export_settings()
 		let response = await eel.import_org_data(export_data, export_org_raw_data, import_settings)();
-		get_import_orgs_info()
+		get_import_orgs_info(response)
 		document.getElementById("importDataBtn").disabled = false;
 		// document.getElementById("compareDataBtn").disabled = false;
 		document.getElementById("importDataBtnSpinner").classList.add("d-none");

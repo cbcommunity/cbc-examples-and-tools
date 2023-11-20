@@ -38,11 +38,12 @@ def credentials_handler():
     return contents, credentials
 
 
-def make_request(req_data):
+def make_request(req_data, org_key, policy_id):
     "text"
     if req_data['type'] == 'POST':
-        req = requests.post(
+        resp = requests.post(
             url=req_data['url'], data=req_data['body'], headers=req_data['headers'])
+        return {'status_code': resp.status_code, 'content': resp.text, 'org_key': org_key, 'policy_id': policy_id}
 
 
 @eel.expose
@@ -287,6 +288,16 @@ def get_import_orgs_info(refresh_info=None):
         return json.dumps(org_info)
 
     html = ''
+    if isinstance(refresh_info, list):
+        for response in refresh_info:
+            if response['status_code'] == 200:
+                html += f"<div class='alert alert-success m-3 text-center' role='alert'>Policy {response['policy_id']} successfully imported.\n"
+            else:
+                html += f"<div class='alert alert-danger m-3 text-center' role='alert'>Policy {response['policy_id']} failed to import.\n"
+                html += f"\nHTTP {response['status_code']}\n"
+                html += response['content']
+            html += "\n</div>"
+
     for import_org in org_profiles:
         cbc = get_cbc(org_profiles[import_org]['PROFILE'])
         policy_info = cbc.select(Policy)
@@ -519,6 +530,7 @@ def sanitise_strings(data):
 
 def create_policy(data, raw_data, settings):
     "text"
+    responses = []
     import_orgs = IMPORT_ORG_PROFILES['import']
     settings = sanitise_strings(settings)
     for org in import_orgs:
@@ -541,13 +553,15 @@ def create_policy(data, raw_data, settings):
                         'type': 'POST'
                         }
 
-            make_request(req_data)
+            responses.append(make_request(
+                req_data, import_orgs[org]['ORG_KEY'], policy))
+    return responses
 
 
 @eel.expose
 def import_org_data(selected_policies, raw_data, import_settings):
     "text"
-    create_policy(selected_policies, raw_data, import_settings)
+    return create_policy(selected_policies, raw_data, import_settings)
 
 
 @eel.expose
