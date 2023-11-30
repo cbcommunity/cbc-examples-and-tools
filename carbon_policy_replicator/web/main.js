@@ -92,7 +92,7 @@ async function refresh_org_data(data, type) {
 		if (type == 'export') {
 				document.getElementById("export_meta_url").textContent = data.url;
 				document.getElementById("export_meta_org_key").textContent = data.org_key;
-				document.getElementById("export_meta_data_source").textContent = data.data_source;
+				// document.getElementById("export_meta_data_source").textContent = data.data_source;
 				document.getElementById("export_meta_timestamp").textContent = data.data_timestamp;
 				document.getElementById("export_meta_rule_count_total").textContent = data.rule_count_total;
 				document.getElementById("export_meta_policy_count_total").textContent = data.policy_count_total;
@@ -142,7 +142,7 @@ async function import_data() {
 		document.getElementById("importOrgsCard").classList.add("disableddiv");
 		get_export_settings()
 		let response = await eel.import_org_data(export_data, export_org_raw_data, import_settings)();
-		get_import_orgs_info()
+		get_import_orgs_info(response)
 		document.getElementById("importDataBtn").disabled = false;
 		// document.getElementById("compareDataBtn").disabled = false;
 		document.getElementById("importDataBtnSpinner").classList.add("d-none");

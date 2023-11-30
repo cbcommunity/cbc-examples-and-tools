@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3.9
+#!/usr/local/bin/python3
 import datetime
 import os
 import subprocess
@@ -11,7 +11,7 @@ from cbc_sdk import CBCloudAPI
 from cbc_sdk.platform import Policy
 
 __title__ = 'Carbon Policy Replicator'
-__version__ = 'v1.0.0'
+__version__ = 'v1.1.0'
 
 
 def get_cbc(profile):
@@ -21,7 +21,7 @@ def get_cbc(profile):
 
 def credentials_handler():
     "text"
-    path = os.path.expanduser( '~' )
+    path = os.path.expanduser('~')
     credentials = path + "/.carbonblack/credentials.cbc"
     contents = ''
     try:
@@ -38,13 +38,20 @@ def credentials_handler():
     return contents, credentials
 
 
+def make_request(req_data, org_key, policy_id):
+    "text"
+    if req_data['type'] == 'POST':
+        resp = requests.post(
+            url=req_data['url'], data=req_data['body'], headers=req_data['headers'])
+        return {'status_code': resp.status_code, 'content': resp.text, 'org_key': org_key, 'policy_id': policy_id}
+
+
 @eel.expose
 def delete_org(org_type, org_key):
     "text"
     contents, credentials_file = credentials_handler()
     if org_type == 'export_org':
         for num, line in enumerate(contents):
-            # if line == f"[PolicyReplicator_ExportProfile_{org_key}]\n":
             if line.startswith(f"[PolicyReplicator_ExportProfile_{org_key}_"):
                 contents[num] = line.replace('[', '[DELETED_')
             else:
@@ -142,7 +149,7 @@ def save_org_data(orgs, org_type):
         lines += f'org_key={data["ORG_KEY"]}\n'
 
     if lines != '':
-        path = os.path.expanduser( '~' )
+        path = os.path.expanduser('~')
         credentials = path + "/.carbonblack/credentials.cbc"
         with open(credentials, "a") as updated_credentials:
             updated_credentials.write(lines)
@@ -281,6 +288,16 @@ def get_import_orgs_info(refresh_info=None):
         return json.dumps(org_info)
 
     html = ''
+    if isinstance(refresh_info, list):
+        for response in refresh_info:
+            if response['status_code'] == 200:
+                html += f"<div class='alert alert-success m-3 text-center' role='alert'>Policy {response['policy_id']} successfully imported in org {response['org_key']}\n"
+            else:
+                html += f"<div class='alert alert-danger m-3 text-center' role='alert'>Policy {response['policy_id']} failed to import in org {response['org_key']}\n"
+                html += f"\n<br>HTTP {response['status_code']}\n"
+                html += response['content']
+            html += "\n</div>"
+
     for import_org in org_profiles:
         cbc = get_cbc(org_profiles[import_org]['PROFILE'])
         policy_info = cbc.select(Policy)
@@ -322,6 +339,15 @@ def get_import_orgs_info(refresh_info=None):
             html += '        </div>'
             html += '    </div>\n'
             html += '    <div class="card-body p-0">\n'
+            html += '<div class="accordion accordion-flush" id="import_rules_accordion">'
+            html += '  <div class="accordion-item">'
+            html += '    <h2 class="accordion-header">'
+            html += f'      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#rules_{policy.id}_{policy.org_key}" aria-expanded="false" aria-controls="flush-collapseOne">'
+            html += '        Rules'
+            html += '      </button>'
+            html += '    </h2>'
+            html += f'    <div id="rules_{policy.id}_{policy.org_key}" class="accordion-collapse collapse">'
+            html += '      <div class="accordion-body">'
             for rule in policy.rules:
                 html += '        <div class="row mx-3 align-items-center py-2 position-relative border-bottom border-200">\n'
                 html += '            <div class="col-1">\n'
@@ -350,6 +376,10 @@ def get_import_orgs_info(refresh_info=None):
                 html += '                </div>\n'
                 html += '            </div>\n'
                 html += '        </div>\n'
+            html += '            </div>'
+            html += '        </div>'
+            html += '    </div>'
+            html += '</div>'
             html += '    </div>\n'
             html += '</div>\n'
         org_info["raw_html"] = html
@@ -397,7 +427,6 @@ def get_export_org_info():
         raw_data = policy._info.copy()
         del raw_data['id']
         del raw_data['update_time']
-        del raw_data['rule_configs']
         del raw_data['sensor_configs']
         policy_id = str(policy.id)
         org_info['raw_data'][policy_id] = raw_data
@@ -436,6 +465,15 @@ def get_export_org_info():
         html += '        </div>'
         html += '    </div>\n'
         html += '    <div class="card-body p-0">\n'
+        html += '<div class="accordion accordion-flush" id="export_rules_accordion">'
+        html += '  <div class="accordion-item">'
+        html += '    <h2 class="accordion-header">'
+        html += f'      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#export_rules_{policy.id}_{policy.org_key}" aria-expanded="false" aria-controls="flush-collapseOne">'
+        html += '        Rules'
+        html += '      </button>'
+        html += '    </h2>'
+        html += f'    <div id="export_rules_{policy.id}_{policy.org_key}" class="accordion-collapse collapse">'
+        html += '      <div class="accordion-body">'
         for rule in policy.rules:
             rule_id = str(rule["id"])
             rule_identifier = str(policy.id) + '_' + str(rule_id)
@@ -469,6 +507,10 @@ def get_export_org_info():
             html += '                </div>\n'
             html += '            </div>\n'
             html += '        </div>\n'
+        html += '            </div>'
+        html += '        </div>'
+        html += '    </div>'
+        html += '</div>'
         html += '    </div>\n'
         html += '</div>\n'
     org_info["raw_html"] = html
@@ -476,20 +518,10 @@ def get_export_org_info():
     return json.dumps(org_info)
 
 
-def sanitise_strings(data):
-    "text"
-    for item in data:
-        data[item] = data[item].replace(" ", "_")
-    if data['policy_name_prefix']:
-        data['policy_name_prefix'] += '_'
-
-    return data
-
-
 def create_policy(data, raw_data, settings):
     "text"
+    responses = []
     import_orgs = IMPORT_ORG_PROFILES['import']
-    settings = sanitise_strings(settings)
     for org in import_orgs:
         for policy in data:
             req_body = raw_data[policy].copy()
@@ -501,19 +533,24 @@ def create_policy(data, raw_data, settings):
                 if str(raw_rule['id']) in data[policy]:
                     req_body['rules'].append(raw_rule)
 
-            req_body_json = json.dumps(req_body)
-            req_url = f'{import_orgs[org]["URL"]}policyservice/v1/orgs/{import_orgs[org]["ORG_KEY"]}/policies'
             req_headers = {'Content-Type': 'application/json',
                            'integration_name': f'{__title__} {__version__}',
                            'X-AUTH-TOKEN': import_orgs[org]["TOKEN"]}
+            req_data = {'body': json.dumps(req_body),
+                        'url': f'{import_orgs[org]["URL"]}policyservice/v1/orgs/{import_orgs[org]["ORG_KEY"]}/policies',
+                        'headers': req_headers,
+                        'type': 'POST'
+                        }
 
-            requests.post(url=req_url, data=req_body_json, headers=req_headers)
+            responses.append(make_request(
+                req_data, import_orgs[org]['ORG_KEY'], policy))
+    return responses
 
 
 @eel.expose
 def import_org_data(selected_policies, raw_data, import_settings):
     "text"
-    create_policy(selected_policies, raw_data, import_settings)
+    return create_policy(selected_policies, raw_data, import_settings)
 
 
 @eel.expose

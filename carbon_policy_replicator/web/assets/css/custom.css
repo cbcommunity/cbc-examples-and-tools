@@ -2,3 +2,17 @@
     pointer-events: none;
     opacity: 0.4;
 }
+.arrow-up::before {
+    content: "\25B2";
+    /* Unicode for upward arrow */
+}
+
+.arrow-down::before {
+    content: "\25BC";
+    /* Unicode for downward arrow */
+}
+
+.collapse.show+.text-center .btn-link #collapse-indicator {
+    transition: 0.3s;
+    transform: rotate(180deg);
+}
