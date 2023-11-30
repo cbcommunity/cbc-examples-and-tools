@@ -291,10 +291,10 @@ def get_import_orgs_info(refresh_info=None):
     if isinstance(refresh_info, list):
         for response in refresh_info:
             if response['status_code'] == 200:
-                html += f"<div class='alert alert-success m-3 text-center' role='alert'>Policy {response['policy_id']} successfully imported.\n"
+                html += f"<div class='alert alert-success m-3 text-center' role='alert'>Policy {response['policy_id']} successfully imported in org {response['org_key']}\n"
             else:
-                html += f"<div class='alert alert-danger m-3 text-center' role='alert'>Policy {response['policy_id']} failed to import.\n"
-                html += f"\nHTTP {response['status_code']}\n"
+                html += f"<div class='alert alert-danger m-3 text-center' role='alert'>Policy {response['policy_id']} failed to import in org {response['org_key']}\n"
+                html += f"\n<br>HTTP {response['status_code']}\n"
                 html += response['content']
             html += "\n</div>"
 
@@ -518,21 +518,10 @@ def get_export_org_info():
     return json.dumps(org_info)
 
 
-def sanitise_strings(data):
-    "text"
-    for item in data:
-        data[item] = data[item].replace(" ", "_")
-    if data['policy_name_prefix']:
-        data['policy_name_prefix'] += '_'
-
-    return data
-
-
 def create_policy(data, raw_data, settings):
     "text"
     responses = []
     import_orgs = IMPORT_ORG_PROFILES['import']
-    settings = sanitise_strings(settings)
     for org in import_orgs:
         for policy in data:
             req_body = raw_data[policy].copy()
