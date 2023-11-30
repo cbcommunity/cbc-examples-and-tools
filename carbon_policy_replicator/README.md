@@ -6,7 +6,7 @@ numerous others. This tool can replicate one or more policies with just a few cl
 
 Under the hood, this tool uses the `Carbon Black Cloud Python SDK` for things like Authentication and Credentials Handling, Retrieving Data from Carbon Black Cloud and Handling Errors and Exceptions. This is one example of how the SDK can be used to build powerful tools and integrations to streamline your workflows.
 
-**Latest Version:** 1.0.0
+**Latest Version:** 1.1.0
 
 **Release Date:** April 7, 2023
 
@@ -24,9 +24,8 @@ Have an idea of a functionality that you want in the tool? Make a suggestion as 
 ## Future Extensions
 * Compare Policy information between organizations
 * Save and Load Policy information
-* Copy Core Prevention and Host Based Firewall rules
 
-<img width="900" alt="Screenshot 2023-03-16 at 12 33 28" src="https://user-images.githubusercontent.com/74309356/225590737-e36fac22-6dbf-4a29-9713-77d6e450632a.png">
+<img width="900" alt="Screenshot 2023-11-30 at 18 11 36" src="https://github.com/cbcommunity/cbc-examples-and-tools/assets/74309356/0977e31f-39ae-416a-9fd4-720209e4d9dc">
 
 ## Getting Started
 
