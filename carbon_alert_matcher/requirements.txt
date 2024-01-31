@@ -1,0 +1,5 @@
+# Package dependencies
+carbon-black-cloud-sdk
+eel
+scikit-learn
+typing
