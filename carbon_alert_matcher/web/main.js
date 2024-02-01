@@ -228,9 +228,7 @@ async function get_import_orgs_settings() {
 		document.getElementById("importOrgsSettingsModalPlaceholder").innerHTML = data;
 }
 
-// async function get_export_org_info() {
 async function get_alerts() {
-		console.log('DUPE')
 		document.getElementById("getPolicyInfoBtn").disabled = true;
 		document.getElementById("getPolicyInfoBtnSpinner").classList.remove("d-none");
 		let org_data = await eel.get_alerts()();
