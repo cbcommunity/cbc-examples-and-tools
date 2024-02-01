@@ -60,40 +60,92 @@ def load_stop_words() -> List[str]:
         return []
 
 
-def get_alerts(alert_id: str = None, start_time: str = None, end_time: str = None, group_by: bool = False) -> dict:
-    """Get all alerts for specific period and group them by reason.
+def get_alerts(**kwargs):
+    """Get all alerts filter by alert type and severity if available
 
-    Arg:
-        cb (BaseAPI): Reference to API object used to communicate with the server.
-        alert_id (str): The id for the alert, for which similar alerts are retrieved.
-        start_time (str): start date for the period
-        end_time (str): end date for the period
-        group_by (bool): whether to group the alerts by reason (default False)
+    Args:
+        kwargs(dict): Settings for the search.
 
     Returns:
-        dict: information about the similar alerts
+        list: list of alerts - either the similar or the initial one, depending on the settings.
+
     """
     # TODO - Do not hard-code
     cb = CBCloudAPI(profile="alert_matcher")
 
-    if not alert_id:
+    if not (kwargs.get("alert_id") or kwargs.get("reason")):
+        # get initial alerts, we do not want similar alerts yet
         alerts = cb.select(Alert)
-        dict_alerts = {}
-        for al in alerts:
-            dict_alerts[al.id] = dict(type=al.type, severity=al.severity, reason=al.reason)
-        return dict_alerts
 
+        # check which alert types to get
+        alert_types = []
+        if kwargs.get("cb_analytics"):
+            alert_types.append("CB_ANALYTICS")
+        if kwargs.get("watchlists"):
+            alert_types.append("WATCHLIST")
+        if kwargs.get("usb_device_control"):
+            alert_types.append("DEVICE_CONTROL")
+        if kwargs.get("host_based_firewall"):
+            alert_types.append("HOST_BASED_FIREWALL")
+        if kwargs.get("intrusion_detection_system"):
+            alert_types.append("INTRUSION_DETECTION_SYSTEM")
+        if kwargs.get("containers_runtime"):
+            alert_types.append("CONTAINER_RUNTIME")
+
+        if alert_types:
+            alerts = alerts.add_criteria("type", alert_types)
+        if kwargs.get("severity"):
+            alerts = alerts.set_minimum_severity(kwargs.get("severity"))
+
+        dict_alerts = {}
+        if not kwargs.get("group"):
+            for al in alerts:
+                dict_alerts[al.id] = dict(type=al.type, severity=al.severity, reason=al.reason, raw=al.to_json())
+            return dict_alerts
+        else:
+            index = -1
+            reasons = []
+            for al in alerts:
+                if al.reason not in reasons:
+                    index += 1
+                    reasons.append(al.reason)
+                    dict_alerts[index] = dict(reason=al.reason, alerts=dict())
+
+                dict_alerts[index]["alerts"][al.id] = dict(
+                    type=al.type, severity=al.severity, reason=al.reason, raw=al.to_json()
+                )
+        return dict_alerts
+    else:
+        # get similar alerts
+        return get_similar_alerts(cb, **kwargs)
+
+
+def get_similar_alerts(cb: CBCloudAPI, **kwargs) -> dict:
+    """Get similar alerts for specific period and group them by reason.
+
+    Arg:
+        cb (BaseAPI): Reference to API object used to communicate with the server.
+        kwargs (dict): Settings
+
+    Returns:
+        dict: information about the similar alerts
+    """
     # get stop word, which are going to be removed from the words of the text
     STOP_WORDS = load_stop_words()
 
     # get the alert and prepare it for clustering
-    alert = cb.select(Alert, alert_id)
-    clean = " ".join([item for item in alert.reason.lower().split() if item not in STOP_WORDS])
+    if kwargs.get("alert_id"):
+        alert = cb.select(Alert, kwargs.get("alert_id"))
+        clean = " ".join([item for item in alert.reason.lower().split() if item not in STOP_WORDS])
+    else:
+        clean = " ".join([item for item in kwargs.get("reason").lower().split() if item not in STOP_WORDS])
 
     # get all the alerts in the said period
     alerts = cb.select(Alert)
-    if start_time and end_time:
-        alerts = alerts.add_time_criteria("backend_update_timestamp", start=start_time, end=end_time)
+    if kwargs.get("start_time") and kwargs.get("end_time"):
+        alerts = alerts.add_time_criteria(
+            "backend_update_timestamp", start=kwargs.get("start_time"), end=kwargs.get("end_time")
+        )
 
     # create the mappings, get the unique reasons, so that the algorithm works on smaller set of records
     alerts_mappings = {}
@@ -109,7 +161,7 @@ def get_alerts(alert_id: str = None, start_time: str = None, end_time: str = Non
 
     # prepare the data to be displayed
     similar_alerts = {}
-    if not group_by:
+    if not kwargs.get("similar_group"):
         for label in cluster_texts:
             curr_alerts = alerts_mappings.get(label)
             for al in curr_alerts:
@@ -122,5 +174,4 @@ def get_alerts(alert_id: str = None, start_time: str = None, end_time: str = Non
             for al in curr_alerts:
                 similar_alerts[index]["alerts"][al.id] = dict(type=al.type, severity=al.severity, reason=al.reason)
             index += 1
-
     return similar_alerts
