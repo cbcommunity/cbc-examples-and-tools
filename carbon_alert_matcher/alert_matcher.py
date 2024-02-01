@@ -6,16 +6,17 @@ import eel
 
 
 @eel.expose
-def get_alerts(match_similar, cb_analytics, watchlists, usb_device_control, host_based_firewall, intrusion_detection_system, containers_runtime):
+def get_alerts(group_similar, cb_analytics, watchlists, usb_device_control, host_based_firewall, intrusion_detection_system, containers_runtime):
     "text"
     req_metadata = {
-        "match_similar": match_similar,
+        "match_similar": group_similar,
         "cb_analytics": cb_analytics,
         "watchlists": watchlists,
         "usb_device_control": usb_device_control,
         "host_based_firewall": host_based_firewall,
         "intrusion_detection_system": intrusion_detection_system,
-        "containers_runtime": containers_runtime
+        "containers_runtime": containers_runtime,
+        "severity": []
     }
     alerts = ga.get_alerts(req_metadata)
 
