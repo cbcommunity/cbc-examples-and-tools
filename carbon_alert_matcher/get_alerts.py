@@ -60,7 +60,7 @@ def load_stop_words() -> List[str]:
         return []
 
 
-def get_alerts(alert_id: str, start_time: str = None, end_time: str = None, group_by: bool = False) -> dict:
+def get_alerts(alert_id: str = None, start_time: str = None, end_time: str = None, group_by: bool = False) -> dict:
     """Get all alerts for specific period and group them by reason.
 
     Arg:
@@ -76,11 +76,18 @@ def get_alerts(alert_id: str, start_time: str = None, end_time: str = None, grou
     # TODO - Do not hard-code
     cb = CBCloudAPI(profile="alert_matcher")
 
+    if not alert_id:
+        alerts = cb.select(Alert)
+        dict_alerts = {}
+        for al in alerts:
+            dict_alerts[al.id] = dict(type=al.type, severity=al.severity, reason=al.reason)
+        return dict_alerts
+
     # get stop word, which are going to be removed from the words of the text
     STOP_WORDS = load_stop_words()
 
     # get the alert and prepare it for clustering
-    alert = cb.select(Alert, ID)
+    alert = cb.select(Alert, alert_id)
     clean = " ".join([item for item in alert.reason.lower().split() if item not in STOP_WORDS])
 
     # get all the alerts in the said period
