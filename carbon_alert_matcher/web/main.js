@@ -45,7 +45,7 @@ async function refresh_org_data(data, type) {
 				document.getElementById("exportPolicyContainer").innerHTML = data.raw_html;
 				document.getElementById("getPolicyInfoBtnSpinner").classList.add("d-none");
 				if (data.org_key != "-"){
-						document.getElementById("getPolicyInfoBtn").disabled = false;
+						document.getElementById("getAlertsBtn").disabled = false;
 				}
 		} else if (type == 'import') {
 				let policyInfoBtnStat = false;
@@ -139,8 +139,8 @@ function select_policy(export_type, policy_id, rule_id) {
 }
 
 async function get_alerts() {
-		document.getElementById("getPolicyInfoBtn").disabled = true;
-		document.getElementById("getPolicyInfoBtnSpinner").classList.remove("d-none");
+		document.getElementById("getAlertsBtn").disabled = true;
+		document.getElementById("getAlertsBtnSpinner").classList.remove("d-none");
 		var group = document.getElementById("group").checked;
 		var cb_analytics = document.getElementById("cbAnalitycs").checked;
 		var watchlists = document.getElementById("watchlists").checked;
@@ -155,7 +155,13 @@ async function get_alerts() {
 			export_org_data_set = true;
 			// export_org_raw_data = parsed_data.raw_data;
 			export_org_raw_data = parsed_data;
-			document.getElementById("getPolicyInfoBtn").disabled = false;
+			document.getElementById("getAlertsBtn").disabled = false;
+			document.getElementById("getAlertsBtnSpinner").classList.add("d-none");
+			if (group == true) {
+				document.getElementById("alertsHeader").innerText = "Grouped Alerts - Reason"
+			} else {
+				document.getElementById("alertsHeader").innerText = "All Alerts"
+			}
 			refresh_org_data(parsed_data, 'import');
 			// enable_import_export();
 		}
