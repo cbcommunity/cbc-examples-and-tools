@@ -42,13 +42,38 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
         # html += '    </div>\n'
         html += '    <div class="card-body p-3">\n'
         html += '        <dl class="row lh-1 hr-margin-y">\n'
-        html += '            <dt class="col-sm-3">Alert ID</dt>\n'
-        html += f'            <dd class="col-sm-7">{alert}</dd>\n'
+        if group is False:
+            html += '            <dt class="col-sm-3">Alert ID</dt>\n'
+            html += f'            <dd class="col-sm-7">{alert}</dd>\n'
+        else:
+            html += '            <dt class="col-sm-3">Alert IDs</dt>\n'
+            html += f'            <dd class="col-sm-7">\n'
+            for alert_id in alerts[alert]["alerts"]:
+                html += f'<div>{alert_id}</div>\n'
+            html += '</dd>\n'
         for item in alerts[alert]:
+            try:
+                if item in ['raw', 'alerts']:
+                    continue
+            except KeyError:
+                continue
             html += f'<dt class="col-sm-3">{item.capitalize()}</dt>\n'
             html += f'<dd class="col-sm-7">{alerts[alert][item]}</dd>\n'
         html += '        </dl>\n'
-        html += f'       <a href="#" data-bs-toggle="modal" data-bs-target="#import_policyasfasfsaf_modal">Details</a>'
+        if group is False:
+            html += f'       <a href="#" data-bs-toggle="modal" data-bs-target="#alert_{alert}_modal">Details</a>'
+            html += f'        <div class="modal modal-xl fade" id="alert_{alert}_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">'
+            html += '          <div class="modal-dialog modal-dialog-scrollable">'
+            html += '            <div class="modal-content">'
+            html += '              <div class="modal-header">'
+            html += '                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
+            html += '              </div>'
+            html += '              <div class="modal-body">'
+            html += f'                {alerts[alert]["raw"]}'
+            html += '              </div>'
+            html += '            </div>'
+            html += '          </div>'
+            html += '        </div>'
         html += '    </div>\n'
         html += '</div>\n'
         # org_info["raw_html"] = html
