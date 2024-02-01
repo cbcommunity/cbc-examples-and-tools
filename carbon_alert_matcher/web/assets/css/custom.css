@@ -16,3 +16,14 @@
     transition: 0.3s;
     transform: rotate(180deg);
 }
+
+/* Custom style for larger form-switch */
+.form-switch .form-check-input {
+    width: 2.3rem;
+    height: 1.1rem;
+}
+
+.form-check-label {
+    padding-left: 12px;
+    /* Adjust the padding value as needed */
+}
