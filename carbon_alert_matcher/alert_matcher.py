@@ -6,10 +6,10 @@ import eel
 
 
 @eel.expose
-def get_alerts(group_similar, cb_analytics, watchlists, usb_device_control, host_based_firewall, intrusion_detection_system, containers_runtime):
+def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_firewall, intrusion_detection_system, containers_runtime):
     "text"
     req_metadata = {
-        "match_similar": group_similar,
+        "group": group,
         "cb_analytics": cb_analytics,
         "watchlists": watchlists,
         "usb_device_control": usb_device_control,

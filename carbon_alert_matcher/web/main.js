@@ -141,14 +141,14 @@ function select_policy(export_type, policy_id, rule_id) {
 async function get_alerts() {
 		document.getElementById("getPolicyInfoBtn").disabled = true;
 		document.getElementById("getPolicyInfoBtnSpinner").classList.remove("d-none");
-		var group_similar = document.getElementById("groupSimilar").checked;
+		var group = document.getElementById("group").checked;
 		var cb_analytics = document.getElementById("cbAnalitycs").checked;
 		var watchlists = document.getElementById("watchlists").checked;
 		var usb_device_control = document.getElementById("usbDeviceControl").checked;
 		var host_based_firewall = document.getElementById("hostBasedFirewall").checked;
 		var intrusion_detection_system = document.getElementById("intrusionDetectionSystem").checked;
 		var containers_runtime = document.getElementById("containersRuntime").checked;
-		let org_data = await eel.get_alerts(group_similar, cb_analytics, watchlists, usb_device_control, host_based_firewall, intrusion_detection_system, containers_runtime)();
+		let org_data = await eel.get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_firewall, intrusion_detection_system, containers_runtime)();
 		var parsed_data = JSON.parse(org_data);
 		console.log(parsed_data)
 		if (parsed_data) {
