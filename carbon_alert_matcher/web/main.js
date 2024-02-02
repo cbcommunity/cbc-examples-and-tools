@@ -1,5 +1,12 @@
 async function clear_page() {
 	document.getElementById("importPolicyContainer").innerHTML = "";
+	document.getElementById("TOTAL_ALERTS").innerText = "-"
+	document.getElementById("WATCHLIST").innerText = "-"
+	document.getElementById("CB_ANALYTICS").innerText = "-" 
+	document.getElementById("DEVICE_CONTROL").innerText = "-" 
+	document.getElementById("HOST_BASED_FIREWALL").innerText = "-" 
+	document.getElementById("INTRUSION_DETECTION_SYSTEM").innerText = "-" 
+	document.getElementById("CONTAINER_RUNTIME").innerText = "-" 
 }
 async function refresh_page(data, group, metadata, alert_id) {
 	document.getElementById("importPolicyContainer").innerHTML = data;
