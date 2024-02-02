@@ -60,7 +60,26 @@ def load_stop_words() -> List[str]:
         return []
 
 
-def get_alerts(settings):
+def gather_alert_types(settings: dict):
+    """Create a list of the alert types, based on the settings."""
+    # check which alert types to get
+    alert_types = []
+    if settings.get("cb_analytics"):
+        alert_types.append("CB_ANALYTICS")
+    if settings.get("watchlists"):
+        alert_types.append("WATCHLIST")
+    if settings.get("usb_device_control"):
+        alert_types.append("DEVICE_CONTROL")
+    if settings.get("host_based_firewall"):
+        alert_types.append("HOST_BASED_FIREWALL")
+    if settings.get("intrusion_detection_system"):
+        alert_types.append("INTRUSION_DETECTION_SYSTEM")
+    if settings.get("containers_runtime"):
+        alert_types.append("CONTAINER_RUNTIME")
+    return alert_types
+
+
+def get_alerts(settings: dict) -> dict:
     """Get all alerts filter by alert type and severity if available
 
     Args:
@@ -76,22 +95,7 @@ def get_alerts(settings):
     if not (settings.get("alert_id") or settings.get("reason")):
         # get initial alerts, we do not want similar alerts yet
         alerts = cb.select(Alert)
-
-        # check which alert types to get
-        alert_types = []
-        if settings.get("cb_analytics"):
-            alert_types.append("CB_ANALYTICS")
-        if settings.get("watchlists"):
-            alert_types.append("WATCHLIST")
-        if settings.get("usb_device_control"):
-            alert_types.append("DEVICE_CONTROL")
-        if settings.get("host_based_firewall"):
-            alert_types.append("HOST_BASED_FIREWALL")
-        if settings.get("intrusion_detection_system"):
-            alert_types.append("INTRUSION_DETECTION_SYSTEM")
-        if settings.get("containers_runtime"):
-            alert_types.append("CONTAINER_RUNTIME")
-
+        alert_types = gather_alert_types(settings)
         if alert_types:
             alerts = alerts.add_criteria("type", alert_types)
         if settings.get("severity"):
@@ -146,6 +150,9 @@ def get_similar_alerts(cb: CBCloudAPI, settings) -> dict:
         alerts = alerts.add_time_criteria(
             "backend_update_timestamp", start=settings.get("start_time"), end=settings.get("end_time")
         )
+    alert_types = gather_alert_types(settings)
+    if alert_types:
+        alerts = alerts.add_criteria("type", alert_types)
 
     # create the mappings, get the unique reasons, so that the algorithm works on smaller set of records
     alerts_mappings = {}
@@ -158,10 +165,9 @@ def get_similar_alerts(cb: CBCloudAPI, settings) -> dict:
 
     # use k-means to cluster the unique reasons
     cluster_texts = perform_kmeans(alerts_mappings.keys(), clean)
-
     # prepare the data to be displayed
     similar_alerts = {}
-    if not settings.get("similar_group"):
+    if not settings.get("group"):
         for label in cluster_texts:
             curr_alerts = alerts_mappings.get(label)
             for al in curr_alerts:
