@@ -9,6 +9,7 @@ async function clear_page() {
 	document.getElementById("CONTAINER_RUNTIME").innerText = "-" 
 }
 async function refresh_page(data, group, metadata, alert_id) {
+	document.getElementById("importPolicyContainer").classList.remove("logo");
 	document.getElementById("importPolicyContainer").innerHTML = data;
 	document.getElementById("getAlertsBtn").disabled = false;
 	document.getElementById("getAlertsBtnSpinner").classList.add("d-none");
