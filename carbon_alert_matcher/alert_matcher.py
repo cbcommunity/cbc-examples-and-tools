@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3
-import datetime
 import json
 import get_alerts as ga
 import eel
@@ -7,7 +6,6 @@ import eel
 
 @eel.expose
 def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_firewall, intrusion_detection_system, containers_runtime):
-    "text"
     req_metadata = {
         "group": group,
         "cb_analytics": cb_analytics,
@@ -19,36 +17,89 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
         "severity": []
     }
     alerts = ga.get_alerts(req_metadata)
+    metadata = {
+        "TOTAL_ALERTS": len(alerts),
+        "CB_ANALYTICS": 0,
+        "WATCHLIST": 0,
+        "DEVICE_CONTROL": 0,
+        "HOST_BASED_FIREWALL": 0,
+        "INTRUSION_DETECTION_SYSTEM": 0,
+        "CONTAINER_RUNTIME": 0,
+    }
 
     html = ''
     for alert in alerts:
+        if group is False:
+            metadata[alerts[alert]['type']] += 1
         html += '<div class="card small mt-0 m-3 border">\n'
         html += '    <div class="card-body p-3 position-relative">\n'
-        html += '        <button type="button" class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 m-3" data-bs-toggle="modal" data-bs-target="#matchSimilarModal">Match Similar</button>\n'
+
+        # "Match Similar" Button
+        html += f'        <button type="button" class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 m-3" data-bs-toggle="modal" data-bs-target="#matchSimilarModal_{alert}">Match Similar</button>\n'
+
+        # Alert Details
         html += '        <dl class="row lh-1 hr-margin-y">\n'
-        html += '        <div class="modal fade" id="matchSimilarModal" tabindex="-1" aria-labelledby="matchSimilarModalLabel" aria-hidden="true">'
-        html += '          <div class="modal-dialog">'
-        html += '            <div class="modal-content">'
-        html += '              <div class="modal-header">'
-        html += '                <h6 class="modal-title" id="matchSimilarModalLabel">Match Similar Alerts</h6>'
-        html += '                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
-        html += '              </div>'
-        html += '              <div class="modal-body">'
-        html += '                <form>'
-        html += '                  <div class="mb-3">'
-        html += '                    <label for="startDate" class="form-label">Start Date</label>'
-        html += '                    <input type="datetime-local" class="form-control" id="startDate" required>'
-        html += '                  </div>'
-        html += '                  <div class="mb-3">'
-        html += '                    <label for="endDate" class="form-label">End Date</label>'
-        html += '                    <input type="datetime-local" class="form-control" id="endDate" required>'
-        html += '                  </div>'
-        html += '                  <button type="submit" class="btn btn-primary">Submit</button>'
-        html += '                </form>'
-        html += '              </div>'
-        html += '            </div>'
-        html += '          </div>'
-        html += '        </div>'
+
+        # Match Similar Modal
+        html += f'        <div class="modal fade" id="matchSimilarModal_{alert}" tabindex="-1" aria-labelledby="matchSimilarModalLabel" aria-hidden="true">\n'
+        html += '          <div class="modal-dialog">\n'
+        html += '            <div class="modal-content">\n'
+        html += '              <div class="modal-header">\n'
+        html += '                <h6 class="modal-title" id="matchSimilarModalLabel">Match Similar Alerts</h6>\n'
+        html += '                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>\n'
+        html += '              </div>\n'
+        html += '              <div class="modal-body">\n'
+
+        # Modal Description
+        html += '                  <div class="card p-0 small border-0 shadow-none">\n'
+        html += '                      <div class="card-body lh-1">\n'
+        html += '                          <h6 class="match-similar-modal">Match all Alerts with a similar Alert Reason.</h6>\n'
+        html += '                          <dl class="row hr-margin-y">\n'
+        html += '                              <dt class="col-sm-2">Reason</dt>\n'
+        html += '                              <dd id="export_meta_org_key"\n'
+        html += f'                                  class="col-sm-8">{alerts[alert]["reason"]}</dd>\n'
+        html += '                          </dl>\n'
+        html += '                      </div>\n'
+        html += '                  </div>\n'
+
+        # Date Time Inputs
+        html += '                  <div class="card p-0 small border-0 shadow-none">\n'
+        html += '                      <div class="card-body lh-1">\n'
+        html += '                          <form>\n'
+        html += '                              <div class="mb-3">\n'
+        html += '                                <label for="startDate" class="form-label">Start Date</label>\n'
+        html += '                                <input type="datetime-local" class="form-control" id="startDate" required>\n'
+        html += '                              </div>\n'
+        html += '                              <div class="mb-3">\n'
+        html += '                                <label for="endDate" class="form-label">End Date</label>\n'
+        html += '                                <input type="datetime-local" class="form-control" id="endDate" required>\n'
+        html += '                              </div>\n'
+        html += '                          </form>\n'
+        html += '                      </div>\n'
+        html += '                  </div>\n'
+
+        # Group Alerts Checkbox
+        html += '                  <div class="card p-0 small border-0 shadow-none" title="Grouping is based on the alert \'reason\'">\n'
+        html += '                      <div class="card-body lh-1">\n'
+        html += '                          <div class="form-check form-switch">\n'
+        html += '                              <input class="form-check-input"\n'
+        html += '                                  type="checkbox"\n'
+        html += '                                  id="group">\n'
+        html += '                              <label class="form-check-label"\n'
+        html += '                                  for="flexSwitchCheckDefault">Group\n'
+        html += '                                  Alerts</label>\n'
+        html += '                          </div>\n'
+        html += '                      </div>\n'
+        html += '                  </div>\n'
+
+        # Submit Button
+        html += '                  <button type="submit" class="btn btn-primary">Submit</button>\n'
+        html += '              </div>\n'
+        html += '            </div>\n'
+        html += '          </div>\n'
+        html += '        </div>\n'
+
+        # Rest of the card content
         if group is False:
             html += '            <dt class="col-sm-3">Alert ID</dt>\n'
             html += f'            <dd class="col-sm-7">{alert}</dd>\n'
@@ -58,6 +109,7 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
             for alert_id in alerts[alert]["alerts"]:
                 html += f'<div>{alert_id}</div>\n'
             html += '</dd>\n'
+
         for item in alerts[alert]:
             try:
                 if item in ['raw', 'alerts']:
@@ -66,31 +118,29 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
                 continue
             html += f'<dt class="col-sm-3">{item.capitalize()}</dt>\n'
             html += f'<dd class="col-sm-7">{alerts[alert][item]}</dd>\n'
+
+        # Modal Trigger for Details
         html += '        </dl>\n'
         if group is False:
-            html += f'       <a href="#" data-bs-toggle="modal" data-bs-target="#alert_{alert}_modal">Details</a>'
-            html += f'        <div class="modal modal-xl fade" id="alert_{alert}_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">'
-            html += '          <div class="modal-dialog modal-dialog-scrollable">'
-            html += '            <div class="modal-content">'
-            html += '              <div class="modal-header">'
-            html += '                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'
-            html += '              </div>'
-            html += '              <div class="modal-body">'
-            html += f'                {alerts[alert]["raw"]}'
-            html += '              </div>'
-            html += '            </div>'
-            html += '          </div>'
-            html += '        </div>'
+            html += f'       <a href="#" data-bs-toggle="modal" data-bs-target="#alert_{alert}_modal">Details</a>\n'
+            html += f'        <div class="modal modal-xl fade" id="alert_{alert}_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">\n'
+            html += '          <div class="modal-dialog modal-dialog-scrollable">\n'
+            html += '            <div class="modal-content">\n'
+            html += '              <div class="modal-header">\n'
+            html += '                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>\n'
+            html += '              </div>\n'
+            html += '              <div class="modal-body">\n'
+            html += f'                {alerts[alert]["raw"]}\n'
+            html += '              </div>\n'
+            html += '            </div>\n'
+            html += '          </div>\n'
+            html += '        </div>\n'
+
         html += '    </div>\n'
         html += '</div>\n'
-        # org_info["raw_html"] = html
+    results = {"raw_html": json.dumps(html), "metadata": metadata}
 
-    # org_info["raw_html"] = html
-    # org_info["data_timestamp"] = str(datetime.datetime.now())
-    # org_info["org_keys"] = ', '.join(alerts.keys())
-    # org_info["orgs_count_total"] = len(alerts.keys())
-
-    return json.dumps(html)
+    return results
 
 
 if __name__ == "__main__":
