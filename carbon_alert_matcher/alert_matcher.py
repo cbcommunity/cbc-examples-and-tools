@@ -16,8 +16,11 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
         "containers_runtime": containers_runtime,
         "severity": []
     }
-    if alert_id != "":
+
+    get_similar = False
+    if alert_id != "" and alert_id is not None:
         req_metadata["alert_id"] = alert_id
+        get_similar = True
     alerts = ga.get_alerts(req_metadata)
 
     metadata = {
@@ -38,7 +41,8 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
         html += '    <div class="card-body p-3 position-relative">\n'
 
         # "Match Similar" Button
-        html += f'        <button type="button" class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 m-3" data-bs-toggle="modal" data-bs-target="#matchSimilarModal_{alert}">Match Similar</button>\n'
+        if get_similar is False:
+            html += f'        <button type="button" class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 m-3" data-bs-toggle="modal" data-bs-target="#matchSimilarModal_{alert}">Match Similar</button>\n'
 
         # Alert Details
         html += '        <dl class="row lh-1 hr-margin-y">\n'
@@ -96,7 +100,8 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
         html += '                  </div>\n'
 
         # Submit Button
-        html += f'                  <button type="button" onClick="get_alerts(\'{alert}\')" id="get_similar_{alert}" class="btn btn-primary">Submit</button>\n'
+        html += f'                  <button type="button" data-bs-dismiss="modal" onClick="get_alerts(\'{alert}\')" data-bs-toggle="modal" data-bs-target="#matchSimilarModal_{alert}" id="get_similar_{alert}" class="btn btn-primary">Submit</button>\n'
+
         # html += f'    <button type="button" onClick="delete_org(\'import_org\', \'{id}\')" data-bs-dismiss="modal" class="btn btn-outline-danger btn-sm position-absolute m-3 end-0 btn-sm">\n'
         html += '              </div>\n'
         html += '            </div>\n'
