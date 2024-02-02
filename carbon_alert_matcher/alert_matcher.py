@@ -5,7 +5,7 @@ import eel
 
 
 @eel.expose
-def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_firewall, intrusion_detection_system, containers_runtime):
+def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_firewall, intrusion_detection_system, containers_runtime, alert_id):
     req_metadata = {
         "group": group,
         "cb_analytics": cb_analytics,
@@ -16,7 +16,10 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
         "containers_runtime": containers_runtime,
         "severity": []
     }
+    if alert_id != "":
+        req_metadata["alert_id"] = alert_id
     alerts = ga.get_alerts(req_metadata)
+
     metadata = {
         "TOTAL_ALERTS": len(alerts),
         "CB_ANALYTICS": 0,
@@ -93,7 +96,8 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
         html += '                  </div>\n'
 
         # Submit Button
-        html += '                  <button type="submit" class="btn btn-primary">Submit</button>\n'
+        html += f'                  <button type="button" onClick="get_alerts(\'{alert}\')" id="get_similar_{alert}" class="btn btn-primary">Submit</button>\n'
+        # html += f'    <button type="button" onClick="delete_org(\'import_org\', \'{id}\')" data-bs-dismiss="modal" class="btn btn-outline-danger btn-sm position-absolute m-3 end-0 btn-sm">\n'
         html += '              </div>\n'
         html += '            </div>\n'
         html += '          </div>\n'
@@ -121,7 +125,7 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
 
         # Modal Trigger for Details
         html += '        </dl>\n'
-        if group is False:
+        if group is False and alert_id == "":
             html += f'       <a href="#" data-bs-toggle="modal" data-bs-target="#alert_{alert}_modal">Details</a>\n'
             html += f'        <div class="modal modal-xl fade" id="alert_{alert}_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">\n'
             html += '          <div class="modal-dialog modal-dialog-scrollable">\n'

@@ -10,13 +10,18 @@ async function refresh_page(data, group, metadata) {
 	document.getElementById("INTRUSION_DETECTION_SYSTEM").innerText = metadata.INTRUSION_DETECTION_SYSTEM
 	document.getElementById("CONTAINER_RUNTIME").innerText = metadata.CONTAINER_RUNTIME
 	if (group == true) {
-		document.getElementById("alertsHeader").innerText = "Grouped Alerts - Reason"
+		document.getElementById("alertsHeader").innerText = "Grouped Alerts - Reason";
+		document.getElementById("TOTAL_ALERTS_TEXT").innerText = "Total Alert Groups";
+		document.getElementsByClassName("alert_metadata")[0].style.visibility = "hidden";
+
 	} else {
 		document.getElementById("alertsHeader").innerText = "All Alerts"
+		document.getElementById("TOTAL_ALERTS_TEXT").innerText = "Total Alerts"
+		document.getElementsByClassName("alert_metadata")[0].style.visibility = "visible";
 	}
 }
 
-async function get_alerts() {
+async function get_alerts(alert_id) {
 	document.getElementById("getAlertsBtn").disabled = true;
 	document.getElementById("getAlertsBtnSpinner").classList.remove("d-none");
 	var group = document.getElementById("group").checked;
@@ -26,7 +31,7 @@ async function get_alerts() {
 	var host_based_firewall = document.getElementById("hostBasedFirewall").checked;
 	var intrusion_detection_system = document.getElementById("intrusionDetectionSystem").checked;
 	var containers_runtime = document.getElementById("containersRuntime").checked;
-	let results = await eel.get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_firewall, intrusion_detection_system, containers_runtime)();
+	let results = await eel.get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_firewall, intrusion_detection_system, containers_runtime, alert_id)();
 	var parsed_data = JSON.parse(results.raw_html);
 	if (parsed_data) {
 		refresh_page(parsed_data, group, results.metadata);
