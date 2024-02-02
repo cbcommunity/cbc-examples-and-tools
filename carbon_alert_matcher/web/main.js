@@ -1,5 +1,6 @@
 async function clear_page() {
-	document.getElementById("importPolicyContainer").innerHTML = "";
+	document.getElementById("importPolicyContainer").classList.add("logo");
+	document.getElementById("importPolicyContainer").innerHTML = "<div style=\'width: 90%; text-align: center; padding: 10px; color: #F8F8F8; font-size: 170px;'>Carbon Black.</div>";
 	document.getElementById("TOTAL_ALERTS").innerText = "-"
 	document.getElementById("WATCHLIST").innerText = "-"
 	document.getElementById("CB_ANALYTICS").innerText = "-" 
