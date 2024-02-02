@@ -42,7 +42,12 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
 
         # "Match Similar" Button
         if get_similar is False:
-            html += f'        <button type="button" onClick="get_alerts(\'{alert}\')" id="get_similar_{alert}" class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 m-3">Match Similar</button>\n'
+            if group is True:
+                first_id = next(iter(alerts[alert]['alerts']))
+                alert_id = first_id
+            else:
+                alert_id = alert
+            html += f'        <button type="button" onClick="get_alerts(\'{alert_id}\')" id="get_similar_{alert_id}" class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 m-3">Match Similar</button>\n'
 
         # Alert Details
         html += '        <dl class="row lh-1 hr-margin-y">\n'

@@ -34,6 +34,10 @@ async function refresh_page(data, group, metadata, alert_id) {
 	if (alert_id) {
 		document.getElementById("alertsHeader").innerText = "Similar Alerts"
 	}
+	if (alert_id && group ) {
+		document.getElementById("alertsHeader").innerText = "Grouped Similar Alerts - Reason"
+	}
+
 }
 
 async function get_alerts(alert_id) {
