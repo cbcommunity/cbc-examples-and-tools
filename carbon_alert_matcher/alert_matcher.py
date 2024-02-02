@@ -130,7 +130,7 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
 
         # Modal Trigger for Details
         html += '        </dl>\n'
-        if group is False and alert_id == "":
+        if group is False and get_similar is False:
             html += f'       <a href="#" data-bs-toggle="modal" data-bs-target="#alert_{alert}_modal">Details</a>\n'
             html += f'        <div class="modal modal-xl fade" id="alert_{alert}_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">\n'
             html += '          <div class="modal-dialog modal-dialog-scrollable">\n'
