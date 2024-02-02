@@ -42,44 +42,10 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
 
         # "Match Similar" Button
         if get_similar is False:
-            # html += f'        <button type="button" class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 m-3" data-bs-toggle="modal" data-bs-target="#matchSimilarModal_{alert}">Match Similar</button>\n'
             html += f'        <button type="button" onClick="get_alerts(\'{alert}\')" id="get_similar_{alert}" class="btn btn-sm btn-outline-primary position-absolute top-0 end-0 m-3">Match Similar</button>\n'
 
         # Alert Details
         html += '        <dl class="row lh-1 hr-margin-y">\n'
-
-        # Match Similar Modal
-        html += f'        <div class="modal fade" id="matchSimilarModal_{alert}" tabindex="-1" aria-labelledby="matchSimilarModalLabel" aria-hidden="true">\n'
-        html += '          <div class="modal-dialog">\n'
-        html += '            <div class="modal-content">\n'
-        html += '              <div class="modal-header">\n'
-        html += '                <h6 class="modal-title" id="matchSimilarModalLabel">Match Similar Alerts</h6>\n'
-        html += '                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>\n'
-        html += '              </div>\n'
-        html += '              <div class="modal-body">\n'
-
-        # Modal Description
-        html += '                  <div class="card p-0 small border-0 shadow-none">\n'
-        html += '                      <div class="card-body lh-1">\n'
-        html += '                          <h6 class="match-similar-modal">Match all Alerts with a similar Alert Reason.</h6>\n'
-        html += '                          <dl class="row hr-margin-y">\n'
-        html += '                              <dt class="col-sm-2">Reason</dt>\n'
-        html += '                              <dd id="export_meta_org_key"\n'
-        html += f'                                  class="col-sm-8">{alerts[alert]["reason"]}</dd>\n'
-        html += '                          </dl>\n'
-        html += '                      </div>\n'
-        html += '                  </div>\n'
-
-        # Date Time Inputs
-
-        # Submit Button
-        html += f'                  <button type="button" data-bs-dismiss="modal" onClick="get_alerts(\'{alert}\')" data-bs-toggle="modal" data-bs-target="#matchSimilarModal_{alert}" id="get_similar_{alert}" class="btn btn-primary">Submit</button>\n'
-
-        # html += f'    <button type="button" onClick="delete_org(\'import_org\', \'{id}\')" data-bs-dismiss="modal" class="btn btn-outline-danger btn-sm position-absolute m-3 end-0 btn-sm">\n'
-        html += '              </div>\n'
-        html += '            </div>\n'
-        html += '          </div>\n'
-        html += '        </div>\n'
 
         # Rest of the card content
         if group is False:
