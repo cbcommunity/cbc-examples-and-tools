@@ -85,20 +85,6 @@ def get_alerts(group, cb_analytics, watchlists, usb_device_control, host_based_f
         html += '                      </div>\n'
         html += '                  </div>\n'
 
-        # Group Alerts Checkbox
-        html += '                  <div class="card p-0 small border-0 shadow-none" title="Grouping is based on the alert \'reason\'">\n'
-        html += '                      <div class="card-body lh-1">\n'
-        html += '                          <div class="form-check form-switch">\n'
-        html += '                              <input class="form-check-input"\n'
-        html += '                                  type="checkbox"\n'
-        html += '                                  id="group">\n'
-        html += '                              <label class="form-check-label"\n'
-        html += '                                  for="flexSwitchCheckDefault">Group\n'
-        html += '                                  Alerts</label>\n'
-        html += '                          </div>\n'
-        html += '                      </div>\n'
-        html += '                  </div>\n'
-
         # Submit Button
         html += f'                  <button type="button" data-bs-dismiss="modal" onClick="get_alerts(\'{alert}\')" data-bs-toggle="modal" data-bs-target="#matchSimilarModal_{alert}" id="get_similar_{alert}" class="btn btn-primary">Submit</button>\n'
 
